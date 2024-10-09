@@ -1,7 +1,7 @@
 import { prismaClient } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-//@ts-ignore
+//@ts-expect-error = This error is expected due to a known issue with the library type definitions
 import youtubesearchapi from "youtube-search-api";
 import { YT_REGEX } from "@/app/lib/utils";
 import { getServerSession } from "next-auth";
@@ -14,6 +14,7 @@ const CreateStreamSchema = z.object({
 const MAX_QUEUE_LEN = 20;
 
 export async function POST(req: NextRequest) {
+    
     try {
         const data = CreateStreamSchema.parse(await req.json());
         const isYt = data.url.match(YT_REGEX)
@@ -22,7 +23,8 @@ export async function POST(req: NextRequest) {
                 message: "Wrong URL format"
             }, {
                 status: 411
-            })    
+            })   
+            console.log(req.method);  
         }
 
         const extractedId = data.url.split("?v=")[1];

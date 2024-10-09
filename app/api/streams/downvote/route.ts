@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
             message: "Done!"
         })
     } catch(e) {
+        console.error('An error occurred:', e); 
         return NextResponse.json({
             message: "Error while upvoting"
         }, {

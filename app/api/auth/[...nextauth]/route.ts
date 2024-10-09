@@ -3,7 +3,7 @@ import NextAuth from "next-auth"
 import { prismaClient } from "@/app/lib/db";
 
 const handler = NextAuth({
-  
+
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -13,7 +13,7 @@ const handler = NextAuth({
     secret: process.env.NEXTAUTH_SECRET ?? "secret",
     callbacks: {
         async signIn(params) {
-          console.log(params)
+            console.log(params)
             if (!params.user.email) {
                 return false;
             }
@@ -23,11 +23,11 @@ const handler = NextAuth({
                     data: {
                         email: params.user.email,
                         provider: "Google"
-                    } 
+                    }
                 })
-             } catch(e) {
-
-             }
+            } catch (e) {
+                console.error('An error occurred:', e);
+            }
             return true;
         }
     }

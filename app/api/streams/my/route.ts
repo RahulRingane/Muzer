@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
         })
     }
 
-    
+    console.log(req.method);
     const streams = await prismaClient.stream.findMany({
         where: {
             userId: user.id

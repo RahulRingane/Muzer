@@ -3,15 +3,15 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-//@ts-ignore
-import { ChevronUp, ChevronDown, ThumbsDown, Play, Share2, Axis3DIcon } from "lucide-react"
+// @ts-expect-erro
+import { ChevronUp, ChevronDown, Play, Share2, } from "lucide-react"
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Appbar } from '../components/Appbar'
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { YT_REGEX } from '../lib/utils'
-//@ts-ignore
+//@ts-expect-error = This error is expected due to a known issue with the library type definitions
 import YouTubePlayer from 'youtube-player';
 
 interface Video {
@@ -49,6 +49,7 @@ export default function StreamView({
         credentials: "include"
     });
     const json = await res.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setQueue(json.streams.sort((a: any, b: any) => a.upvotes < b.upvotes ? 1 : -1));
     
     setCurrentVideo(video => {
@@ -61,22 +62,24 @@ export default function StreamView({
 
   useEffect(() => {
     refreshStreams();
-    const interval = setInterval(() => {
+     setInterval(() => {
         refreshStreams();
     }, REFRESH_INTERVAL_MS)
   }, [])
+  //add here const interval
 
   useEffect(() => {
     if (!videoPlayerRef.current) {
         return;
     }
-    let player = YouTubePlayer(videoPlayerRef.current);
+    const player = YouTubePlayer(videoPlayerRef.current);
     
     // 'loadVideoById' is queued until the player is ready to receive API calls.
     player.loadVideoById(currentVideo?.extractedId);
     
     // 'playVideo' is queue until the player is ready to received API calls and after 'loadVideoById' has been called.
     player.playVideo();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function eventHandler(event: any) {
         console.log(event);
         console.log(event.data);
@@ -135,7 +138,7 @@ export default function StreamView({
             setCurrentVideo(json.stream)
             setQueue(q => q.filter(x => x.id !== json.stream?.id))
         } catch(e) {
-
+            console.log(e , "error")
         }
         setPlayNextLoader(false)
     }
@@ -239,7 +242,7 @@ export default function StreamView({
                                 {currentVideo ? (
                                     <div>
                                         {playVideo ? <>
-                                        {/* @ts-ignore */}
+                                        {/* @ts-expect-error = This error is expected due to a known issue with the library type definitions */}
                                             <div ref={videoPlayerRef} className='w-full' />
                                             {/* <iframe width={"100%"} height={300} src={`https://www.youtube.com/embed/${currentVideo.extractedId}?autoplay=1`} allow="autoplay"></iframe> */}
                                         </> : <>
