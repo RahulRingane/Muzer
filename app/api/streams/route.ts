@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     
     try {
         const data = CreateStreamSchema.parse(await req.json());
+        console.log(data)
         const isYt = data.url.match(YT_REGEX)
         if (!isYt) {
             return NextResponse.json({
@@ -96,6 +97,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!creatorId) {
+        console.log(creatorId)
         return NextResponse.json({
             message: "Error"
         }, {
