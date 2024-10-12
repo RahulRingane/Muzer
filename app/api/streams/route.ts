@@ -61,6 +61,8 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        console.log(stream)
+
         return NextResponse.json({
             ...stream,
             hasUpvoted: false,

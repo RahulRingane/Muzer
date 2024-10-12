@@ -94,28 +94,43 @@ export default function StreamView({
     }, [currentVideo, videoPlayerRef])
 
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const res = await fetch("/api/streams", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Content-Length": JSON.stringify({
-                    creatorId,
-                    url: inputLink
-                }).length.toString(), // Explicitly set content length
-            },
-            body: JSON.stringify({
-                creatorId,
-                url: inputLink
-            })
+
+        // Create the payload
+        const payload = JSON.stringify({
+            creatorId,
+            url: inputLink
         });
-        setQueue([...queue, await res.json()])
+
+        try {
+            // Make the request with proper headers
+            const res = await fetch("/api/streams", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Content-Length": new TextEncoder().encode(payload).length.toString() // Ensure correct Content-Length
+                },
+                body: payload // Use the same payload
+            });
+
+            // Check if the response is okay before processing
+            if (res.ok) {
+                const responseData = await res.json();
+                setQueue([...queue, responseData]);
+            } else {
+                // Handle error response
+                console.error("Failed to add stream", res.status);
+            }
+        } catch (error) {
+            console.error("Error submitting stream:", error);
+        }
+
         setLoading(false);
-        setInputLink('')
-    }
+        setInputLink(''); // Clear the input after submission
+    };
+
     const handleVote = (id: string, isUpvote: boolean) => {
         setQueue(queue.map(video =>
             video.id === id
