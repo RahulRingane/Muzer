@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 //@ts-expect-error = This error is expected due to a known issue with the library type definitions
 import youtubesearchapi from "youtube-search-api";
-//import { YT_REGEX } from "@/app/lib/utils";
+import { YT_REGEX } from "@/app/lib/utils";
 import { getServerSession } from "next-auth";
 
 const CreateStreamSchema = z.object({
@@ -84,14 +84,18 @@ export async function POST(req: NextRequest) {
         const data = CreateStreamSchema.parse(await req.json());
         console.log(data);
 
-        const YT_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-        const match = data.url.match(YT_REGEX);
-        console.log(YT_REGEX)
-        if (!match || match.length < 2) {
-            return NextResponse.json({ message: "Invalid YouTube URL format" }, { status: 400 });
+        const isYt = data.url.match(YT_REGEX);
+        const extractedId = data.url ? data.url.match(YT_REGEX)?.[1] : null;
+        if (!isYt || !extractedId) {
+            return NextResponse.json(
+                {
+                    message: "Invalid YouTube URL format",
+                },
+                {
+                    status: 400,
+                },
+            );
         }
-
-        const extractedId = match[1];  // Extracted YouTube video ID
         let res;
 
         try {
