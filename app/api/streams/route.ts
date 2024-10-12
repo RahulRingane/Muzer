@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
 
         const isYt = data.url.match(YT_REGEX);
         const extractedId = data.url ? data.url.match(YT_REGEX)?.[1] : null;
+        console.log(extractedId)
         if (!isYt || !extractedId) {
             return NextResponse.json(
                 {
