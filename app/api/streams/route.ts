@@ -102,7 +102,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
         }
 
-        const thumbnails = res.thumbnail?.thumbnails;
+        /*const thumbnails = res.thumbnail?.thumbnails;
+        if (!thumbnails || !Array.isArray(thumbnails) || thumbnails.length === 0) {
+            return NextResponse.json({ message: "No thumbnails found" }, { status: 404 });
+        }*/
+
+        const thumbnails = res.thumbnail.thumbnails;
+        thumbnails.sort((a: { width: number }, b: { width: number }) => a.width < b.width ? -1 : 1);
         if (!thumbnails || !Array.isArray(thumbnails) || thumbnails.length === 0) {
             return NextResponse.json({ message: "No thumbnails found" }, { status: 404 });
         }
