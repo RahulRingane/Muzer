@@ -11,10 +11,10 @@ const CreateStreamSchema = z.object({
     url: z.string()
 });
 
-//const MAX_QUEUE_LEN = 20;
+const MAX_QUEUE_LEN = 20;
 
-/*export async function POST(req: NextRequest) {
-    
+export async function POST(req: NextRequest) {
+
     try {
         const data = CreateStreamSchema.parse(await req.json());
         console.log(data)
@@ -24,8 +24,8 @@ const CreateStreamSchema = z.object({
                 message: "Wrong URL format"
             }, {
                 status: 411
-            })   
-            console.log(req.method);  
+            })
+            console.log(req.method);
         }
 
         const extractedId = data.url.split("?v=")[1];
@@ -33,7 +33,7 @@ const CreateStreamSchema = z.object({
         const res = await youtubesearchapi.GetVideoDetails(extractedId);
 
         const thumbnails = res.thumbnail.thumbnails;
-        thumbnails.sort((a: {width: number}, b: {width: number}) => a.width < b.width ? -1 : 1);
+        thumbnails.sort((a: { width: number }, b: { width: number }) => a.width < b.width ? -1 : 1);
 
         const existingActiveStream = await prismaClient.stream.count({
             where: {
@@ -68,7 +68,7 @@ const CreateStreamSchema = z.object({
             hasUpvoted: false,
             upvotes: 0
         })
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         return NextResponse.json({
             message: "Error while adding a stream"
@@ -78,64 +78,6 @@ const CreateStreamSchema = z.object({
     }
 
 
-}*/
-export async function POST(req: NextRequest) {
-    try {
-        const data = CreateStreamSchema.parse(await req.json());
-        console.log(data);
-
-        const isYt = data.url.match(YT_REGEX);
-        const extractedId = data.url ? data.url.match(YT_REGEX)?.[1] : null;
-        console.log(extractedId)
-        if (!isYt || !extractedId) {
-            return NextResponse.json(
-                {
-                    message: "Invalid YouTube URL format",
-                },
-                {
-                    status: 400,
-                },
-            );
-        }
-        let res;
-
-        try {
-            res = await youtubesearchapi.GetVideoDetails(extractedId);
-            console.log('YouTube API Response:', res);
-        } catch (error) {
-            console.error('Error fetching video details:', error);
-            return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
-        }
-
-        /*const thumbnails = res.thumbnail?.thumbnails;
-        if (!thumbnails || !Array.isArray(thumbnails) || thumbnails.length === 0) {
-            return NextResponse.json({ message: "No thumbnails found" }, { status: 404 });
-        }*/
-
-        const thumbnails = res.thumbnail.thumbnails;
-        thumbnails.sort((a: { width: number }, b: { width: number }) => a.width < b.width ? -1 : 1);
-        if (!thumbnails || !Array.isArray(thumbnails) || thumbnails.length === 0) {
-            return NextResponse.json({ message: "No thumbnails found" }, { status: 404 });
-        }
-
-        // Proceed with the rest of your logic...
-        const stream = await prismaClient.stream.create({
-            data: {
-                userId: data.creatorId,
-                url: data.url,
-                extractedId,
-                type: "Youtube",
-                title: res.title ?? "Can't find video",
-                smallImg: (thumbnails.length > 1 ? thumbnails[thumbnails.length - 2].url : thumbnails[thumbnails.length - 1].url) ?? "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
-                bigImg: thumbnails[thumbnails.length - 1].url ?? "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg"
-            }
-        });
-
-        return NextResponse.json({ ...stream, hasUpvoted: false, upvotes: 0 });
-    } catch (e) {
-        console.error('Error in POST handler:', e);
-        return NextResponse.json({ message: "Error while adding a stream" }, { status: 500 });
-    }
 }
 
 
