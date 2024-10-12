@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
         console.log(thumbnails.length)
         if (thumbnails.length === 0) {
             console.error('No thumbnails found for video ID:', extractedId);
-            return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
+          //  return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
         }
 
         const existingActiveStream = await prismaClient.stream.count({
