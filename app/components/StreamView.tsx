@@ -110,7 +110,7 @@ export default function StreamView({
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Content-Length": new TextEncoder().encode(body).length.toString() // Ensure correct Content-Length
+                   // "Content-Length": new TextEncoder().encode(body).length.toString() // Ensure correct Content-Length
                 },
                 body: body // Use the same payload
             });
