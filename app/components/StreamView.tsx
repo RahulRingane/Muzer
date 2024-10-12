@@ -99,7 +99,7 @@ export default function StreamView({
         setLoading(true);
 
         // Create the payload
-        const payload = JSON.stringify({
+        const body = JSON.stringify({
             creatorId,
             url: inputLink
         });
@@ -110,9 +110,9 @@ export default function StreamView({
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Content-Length": new TextEncoder().encode(payload).length.toString() // Ensure correct Content-Length
+                    "Content-Length": new TextEncoder().encode(body).length.toString() // Ensure correct Content-Length
                 },
-                body: payload // Use the same payload
+                body: body // Use the same payload
             });
 
             // Check if the response is okay before processing
