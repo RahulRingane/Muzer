@@ -93,37 +93,22 @@ export default function StreamView({
         }
     }, [currentVideo, videoPlayerRef])
 
-    const body = JSON.stringify({
-        creatorId,
-        url: inputLink,
-    });
+   
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         const res = await fetch("/api/streams", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                // This header is not necessary in most cases, but try adding it manually
-                "Content-Length": body.length.toString(), // Explicitly set Content-Length
-            },
-            body: body,
-        });
-       /* const res = await fetch("/api/streams/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json", // Specify the content type
-                "Content-Length": body.length.toString(),
-            },
             body: JSON.stringify({
                 creatorId,
                 url: inputLink
-            })*/
+            })
+        });
         setQueue([...queue, await res.json()])
         setLoading(false);
         setInputLink('')
-    }
+      }
 
     const handleVote = (id: string, isUpvote: boolean) => {
         setQueue(queue.map(video =>
