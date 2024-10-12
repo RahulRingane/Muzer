@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 //@ts-expect-error = This error is expected due to a known issue with the library type definitions
 import youtubesearchapi from "youtube-search-api";
-import { YT_REGEX } from "@/app/lib/utils";
+//import { YT_REGEX } from "@/app/lib/utils";
 import { getServerSession } from "next-auth";
 
 const CreateStreamSchema = z.object({
@@ -11,7 +11,7 @@ const CreateStreamSchema = z.object({
     url: z.string()
 });
 
-const MAX_QUEUE_LEN = 20;
+//const MAX_QUEUE_LEN = 20;
 
 /*export async function POST(req: NextRequest) {
     
@@ -77,14 +77,16 @@ const MAX_QUEUE_LEN = 20;
         })
     }
 
+
 }*/
 export async function POST(req: NextRequest) {
     try {
         const data = CreateStreamSchema.parse(await req.json());
         console.log(data);
 
-        const urlPattern = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-        const match = data.url.match(urlPattern);
+        const YT_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const match = data.url.match(YT_REGEX);
+        console.log(YT_REGEX)
         if (!match || match.length < 2) {
             return NextResponse.json({ message: "Invalid YouTube URL format" }, { status: 400 });
         }
@@ -100,7 +102,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
         }
 
-        const thumbnails = res.thumbnail?.thumbnails; 
+        const thumbnails = res.thumbnail?.thumbnails;
         if (!thumbnails || !Array.isArray(thumbnails) || thumbnails.length === 0) {
             return NextResponse.json({ message: "No thumbnails found" }, { status: 404 });
         }
@@ -129,9 +131,9 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     const creatorId = req.nextUrl.searchParams.get("creatorId");
     const session = await getServerSession();
-    
-     // TODO: You can get rid of the db call here 
-     const user = await prismaClient.user.findFirst({
+
+    // TODO: You can get rid of the db call here 
+    const user = await prismaClient.user.findFirst({
         where: {
             email: session?.user?.email ?? ""
         }
@@ -181,13 +183,13 @@ export async function GET(req: NextRequest) {
     })])
 
     return NextResponse.json({
-        streams: streams.map(({_count, ...rest}) => ({
+        streams: streams.map(({ _count, ...rest }) => ({
             ...rest,
             upvotes: _count.upvotes,
             haveUpvoted: rest.upvotes.length ? true : false
         })),
         activeStream
-           
+
     })
-    
+
 }
