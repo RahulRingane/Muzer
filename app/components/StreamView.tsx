@@ -99,26 +99,22 @@ export default function StreamView({
         setLoading(true);
 
         // Create the payload
-        const body = JSON.stringify({
-            creatorId,
-            url: inputLink
-        });
+        
 
         try {
             // Make the request with proper headers
             const res = await fetch("/api/streams", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                   // "Content-Length": new TextEncoder().encode(body).length.toString() // Ensure correct Content-Length
-                },
-                body: body // Use the same payload
+                body: JSON.stringify({
+                    creatorId,
+                    url: inputLink
+                }) // Use the same payload
             });
 
             // Check if the response is okay before processing
             if (res.ok) {
-                const responseData = await res.json();
-                setQueue([...queue, responseData]);
+               
+                setQueue([...queue, await res.json()])
             } else {
                 // Handle error response
                 console.error("Failed to add stream", res.status);
