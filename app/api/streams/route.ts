@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
 
         // Safeguard against missing thumbnails or undefined response
         const thumbnails = res?.thumbnail?.thumbnails || [];
+        console.log(thumbnails)
+        console.log(thumbnails.length)
         if (thumbnails.length === 0) {
             console.error('No thumbnails found for video ID:', extractedId);
             return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
