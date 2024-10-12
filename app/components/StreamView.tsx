@@ -54,7 +54,7 @@ export default function StreamView({
 
         setCurrentVideo(video => {
             if (video?.id === json.activeStream?.stream?.id) {
-                 return video;
+                return video;
             }
             return json.activeStream.stream
         });
@@ -93,13 +93,20 @@ export default function StreamView({
         }
     }, [currentVideo, videoPlayerRef])
 
-   
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const res = await fetch("/api/streams", {
+        const res = await fetch("/api/streams/", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": JSON.stringify({
+                    creatorId,
+                    url: inputLink
+                }).length.toString(), // Explicitly set content length
+            },
             body: JSON.stringify({
                 creatorId,
                 url: inputLink
@@ -108,8 +115,7 @@ export default function StreamView({
         setQueue([...queue, await res.json()])
         setLoading(false);
         setInputLink('')
-      }
-
+    }
     const handleVote = (id: string, isUpvote: boolean) => {
         setQueue(queue.map(video =>
             video.id === id
