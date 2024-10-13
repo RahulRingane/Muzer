@@ -1,4 +1,6 @@
 import { prismaClient } from "@/app/lib/db";
+//@ts-expect-error = This error is expected due to a known issue with the library type definitions
+import youtubeThumbnail from 'youtube-thumbnail'
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 //@ts-expect-error = This error is expected due to a known issue with the library type definitions
@@ -94,6 +96,9 @@ export async function POST(req: NextRequest) {
         const extractedId = match[1];
         let res;
 
+        const YTT = youtubeThumbnail(data.url)
+        console.log(YTT)
+
         /*try {
             res = await youtubesearchapi.GetVideoDetails(extractedId);
             console.log('YouTube API Response:', JSON.stringify(res, null, 2));
@@ -114,11 +119,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
         }
 
-
+        
         // Safeguard against missing thumbnails or undefined response
         const thumbnails = res?.thumbnail?.thumbnails || [];
-        console.log(thumbnails)
-        console.log(thumbnails.length)
+       // console.log(thumbnails)
+       // console.log(thumbnails.length)
         if (thumbnails.length === 0) {
             console.error('No thumbnails found for video ID:', extractedId);
             //  return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
