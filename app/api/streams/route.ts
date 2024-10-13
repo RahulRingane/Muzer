@@ -94,13 +94,26 @@ export async function POST(req: NextRequest) {
         const extractedId = match[1];
         let res;
 
-        try {
+        /*try {
             res = await youtubesearchapi.GetVideoDetails(extractedId);
             console.log('YouTube API Response:', JSON.stringify(res, null, 2));
         } catch (error) {
             console.error('Error fetching video details:', error);
             return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
+        }*/
+
+        try {
+            res = await youtubesearchapi.GetVideoDetails(extractedId);
+            if (!res || !res.thumbnail?.thumbnails || !res.title) {
+                console.error('Incomplete YouTube API response', res);
+                return NextResponse.json({ message: "Incomplete video details" }, { status: 500 });
+            }
+            console.log('YouTube API Response:', JSON.stringify(res, null, 2));
+        } catch (error) {
+            console.error('Error fetching video details:', error);
+            return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
         }
+
 
         // Safeguard against missing thumbnails or undefined response
         const thumbnails = res?.thumbnail?.thumbnails || [];
@@ -108,7 +121,7 @@ export async function POST(req: NextRequest) {
         console.log(thumbnails.length)
         if (thumbnails.length === 0) {
             console.error('No thumbnails found for video ID:', extractedId);
-          //  return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
+            //  return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
         }
 
         const existingActiveStream = await prismaClient.stream.count({
