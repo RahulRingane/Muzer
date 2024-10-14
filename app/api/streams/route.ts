@@ -1,6 +1,6 @@
 import { prismaClient } from "@/app/lib/db";
-//@ts-expect-error = This error is expected due to a known issue with the library type definitions
-import youtubeThumbnail from 'youtube-thumbnail'
+import * as yt from 'youtube-search-without-api-key';
+
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 //@ts-expect-error = This error is expected due to a known issue with the library type definitions
@@ -95,17 +95,9 @@ export async function POST(req: NextRequest) {
 
         const extractedId = match[1];
         let res;
-
-        const YTT = youtubeThumbnail(data.url)
-        console.log(YTT)
-
-        /*try {
-            res = await youtubesearchapi.GetVideoDetails(extractedId);
-            console.log('YouTube API Response:', JSON.stringify(res, null, 2));
-        } catch (error) {
-            console.error('Error fetching video details:', error);
-            return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
-        }*/
+        //@ts ignore
+        const videos = await yt.search(extractedId);
+        console.log(videos)
 
         try {
             res = await youtubesearchapi.GetVideoDetails(extractedId);
