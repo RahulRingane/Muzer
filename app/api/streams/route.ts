@@ -94,14 +94,18 @@ export async function POST(req: NextRequest) {
         }
 
         const extractedId = match[1];
-        let res;
+        
         //@ts ignore
         const videos = await yt.search(extractedId);
         console.log(videos)
+        const firstVideo = videos[0];
+        const thumbnailUrl = firstVideo.snippet.thumbnails.url; // Access the URL of the thumbnail
 
-        try {
-            res = await youtubesearchapi.GetVideoDetails(extractedId);
-            if (!res || !res.thumbnail?.thumbnails || !res.title) {
+        console.log('Thumbnail URL:', thumbnailUrl);
+
+       // try {
+           const res = await youtubesearchapi.GetVideoDetails(extractedId);
+            /*if (!res || !res.thumbnail?.thumbnails || !res.title) {
                 console.error('Incomplete YouTube API response', res);
                 return NextResponse.json({ message: "Incomplete video details" }, { status: 500 });
             }
@@ -109,17 +113,17 @@ export async function POST(req: NextRequest) {
         } catch (error) {
             console.error('Error fetching video details:', error);
             return NextResponse.json({ message: "Error fetching video details" }, { status: 500 });
-        }
+        }*/
 
         
         // Safeguard against missing thumbnails or undefined response
-        const thumbnails = res?.thumbnail?.thumbnails || [];
+       // const thumbnails = res?.thumbnail?.thumbnails || [];
        // console.log(thumbnails)
        // console.log(thumbnails.length)
-        if (thumbnails.length === 0) {
+       /* if (thumbnails.length === 0) {
             console.error('No thumbnails found for video ID:', extractedId);
             //  return NextResponse.json({ message: "No thumbnails found for the video" }, { status: 404 });
-        }
+        }*/
 
         const existingActiveStream = await prismaClient.stream.count({
             where: {
@@ -142,8 +146,8 @@ export async function POST(req: NextRequest) {
                 extractedId,
                 type: "Youtube",
                 title: res.title || "Can't find video",
-                smallImg: (thumbnails.length > 1 ? thumbnails[thumbnails.length - 2].url : thumbnails[thumbnails.length - 1].url) || "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
-                bigImg: thumbnails[thumbnails.length - 1].url || "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg"
+                smallImg:thumbnailUrl ,//(thumbnails.length > 1 ? thumbnails[thumbnails.length - 2].url : thumbnails[thumbnails.length - 1].url) || "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg",
+                bigImg:thumbnailUrl // thumbnails[thumbnails.length - 1].url || "https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg"
             }
         });
 
@@ -154,7 +158,8 @@ export async function POST(req: NextRequest) {
             hasUpvoted: false,
             upvotes: 0
         });
-    } catch (e) {
+    } 
+        catch (e) {
         console.error('Error in POST handler:', e);
         return NextResponse.json({
             message: "Error while adding a stream"
@@ -231,3 +236,5 @@ export async function GET(req: NextRequest) {
     })
 
 }
+
+
